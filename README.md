@@ -12,3 +12,17 @@ git clone https://github.com/bjma/gurl.git
 cd gurl
 go install
 ```
+
+## Usage
+Run the Makefile using `make` to compile the executable. Then, simply run `gurl` like the following:
+```
+./gurl [URL] [OPTIONS -f]
+```
+
+### Options
+* `url` - Specify URL (defaulted to `argv[1]`)
+* `X` - Specify METHOD (defaulted to `GET`)
+* `d` - Data to write; can be a `string`, or a file (prefixed by `@`) **TODO**
+* `o` - Write output to file (defaulted to `stdout`) **TODO**
+* `H` - Set header **TODO**
+* `s` - Suppress header output

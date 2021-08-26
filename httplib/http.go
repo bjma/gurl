@@ -20,10 +20,10 @@ type HttpSettings struct {
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
 type HttpRequest struct {
+    Request *http.Request
+    Response *http.Response
+    setting HttpSettings // CLI settings
     url *url.URL
-    setting HttpSettings
-    req *http.Request
-    res *http.Response
     dump []byte
 }
 
@@ -37,36 +37,36 @@ func NewHttpRequest(uri, method string) *HttpRequest {
         Method: method,
         URL: u,
         Header: make(http.Header),
-        Proto: "HTTP/1.1",
-        ProtoMajor: 1,
-        ProtoMinor: 1,
+        Proto: "HTTP/2.0",
+        ProtoMajor: 2,
+        ProtoMinor: 0,
     }
     var resp *http.Response
-    return &HttpRequest{url: u, setting: defaultHttpSetting, req: &r, res: resp}
+    return &HttpRequest{url: u, setting: defaultHttpSetting, Request: &r, Response: resp}
 }
 
 func SendRequest(r *HttpRequest) (*http.Response, error) {
-    dump, err := httputil.DumpRequest(r.req, r.setting.DumpBody)
+    dump, err := httputil.DumpRequest(r.Request, r.setting.DumpBody)
     if err != nil {
         fmt.Println(err.Error())
     }
     r.dump = dump
     client := &http.Client{}
-    res, err := client.Do(r.req)
+    resp, err := client.Do(r.Request)
     if err != nil {
         return nil, err
     }
     // set response field 
-    r.res = res
-    return res, err
+    r.Response = resp
+    return resp, err
 }
 
 func GetResponse(r *HttpRequest) (*http.Response, error) {
-    res, err := SendRequest(r)
+    resp, err := SendRequest(r)
     if err != nil {
         return nil, err
     }
-    return res, err
+    return resp, err
 }
 
 func GetDump(r *HttpRequest) []byte {
@@ -74,12 +74,11 @@ func GetDump(r *HttpRequest) []byte {
 }
 
 
-
 func SetHost(r *HttpRequest, host string) {
-    r.req.Host = host
+    r.Request.Host = host
 }
 
 // https://pkg.go.dev/net/http#Header
 func SetHeader(r *HttpRequest, key, value string) {
-    r.req.Header.Set(key, value)
+    r.Request.Header.Set(key, value)
 }

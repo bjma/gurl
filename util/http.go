@@ -2,35 +2,27 @@ package util
 
 import (
 	"bytes"
-	"fmt"
+	"io/ioutil"
 	"net/http"
-
-	"github.com/bjma/gurl/httplib"
+	"strings"
 )
 
-// Sets the request header, send HTTP request,
-// cooks output, and performs a bunch of stuff according to
-// flags
-// https://developer.mozilla.org/en-US/docs/Glossary/Request_header
-func DoHTTP(url, method string) {
-    // Initialize request according to flags
-    req := httplib.NewHttpRequest(url, method)
-    httplib.SetHeader(req, "User-Agent", "gurl/1.0")
-    res, err := httplib.GetResponse(req)
-    fmt.Println(string(httplib.GetDump(req)))
+// https://developer.mozilla.org/en-US/docs/Glossary/Response_header
+func FormatResponseHeader(method string, resp *http.Response) []byte {
+    var buf bytes.Buffer
+    // Format response header
+    buf.WriteString(resp.Proto + " " + resp.Status + "\n")
+    for k, v := range resp.Header {
+        buf.WriteString(k + ": " + strings.Join(v, "; ") + "\n")
+    }
+    return buf.Bytes()
+}
+
+func FormatResponseBody(res *http.Response) []byte {
+    bodyBytes, err := ioutil.ReadAll(res.Body)
     if err != nil {
         panic(err)
     }
-    fmt.Println(res)
-}
-
-func formatRequest(r *httplib.HttpRequest) string {
-    var buf bytes.Buffer
-    return buf.String()
-}
-
-// https://developer.mozilla.org/en-US/docs/Glossary/Response_header
-func formatResponse(method string, res *http.Response) string {
-	var buf bytes.Buffer
-	return buf.String()
+    bodyStr := bodyBytes
+    return bodyStr
 }
