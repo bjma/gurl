@@ -13,4 +13,9 @@ gurl
 *.out
 
 # Dependency directories (remove the comment below to include it)
+
+# Miscellanous
+tmp/
+*.txt
+_design/
 .DS_Store
