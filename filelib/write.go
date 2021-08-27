@@ -7,7 +7,7 @@ import (
 
 // Wrties to file
 // https://gobyexample.com/writing-files
-func WriteFile(filePath string, data []byte) int {
+func WriteFile(filePath string, data []byte, lock chan int) {
 	fd, err := os.Create(filePath)
 	if err != nil {
 		panic(err)
@@ -20,6 +20,8 @@ func WriteFile(filePath string, data []byte) int {
 		panic(err)
 	}
 	fd.Sync()
-
-	return bytesWritten
+	// Might not need synchronization here either,
+	// but in case we need to write from multiple goroutines
+	// might as well
+	lock <- bytesWritten
 }

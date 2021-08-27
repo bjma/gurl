@@ -26,3 +26,15 @@ func FormatResponseBody(res *http.Response) []byte {
 	bodyStr := bodyBytes
 	return bodyStr
 }
+
+// Files are prefixed by '@' symbol;
+// else, treat as string data
+func ParseRequestBody(data string) string {
+	var reqBody string
+	if strings.HasPrefix(data, "@") {
+		reqBody = ParseFile(data)
+	} else {
+		reqBody = data
+	}
+	return reqBody
+}
