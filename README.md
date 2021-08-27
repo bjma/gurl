@@ -24,6 +24,6 @@ Run the Makefile using `make` to compile the executable. Then, simply run `gurl`
 * `X` - Specify METHOD (defaulted to `GET`)
 * `d` - Read data from a `string` or file prefixed by `@` **TODO**
 * `o` - Write output to file (defaulted to `stdout`)
-* `H` - Set header **TODO**
+* `H` - Set header
 * `s` - Suppress header output
 * `v` - Debugging

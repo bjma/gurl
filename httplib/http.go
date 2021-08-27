@@ -2,32 +2,27 @@ package httplib
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"time"
+	"strings"
 )
 
-var defaultHttpSetting = HttpSettings{"gurl", 30 * time.Second, true}
-
-// https://blog.golang.org/http-tracing
+var defaultHttpSetting = HttpSettings{true}
 
 type HttpSettings struct {
-	UserAgent      string
-	ConnectTimeout time.Duration
-	DumpBody       bool
+	DumpBody bool
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
 type HttpRequest struct {
-	req     *http.Request
-	resp    *http.Response
-	setting HttpSettings // CLI settings
-	url     *url.URL
-	dump    []byte
+	req  *http.Request
+	resp *http.Response
+	url  *url.URL
+	dump []byte
 }
 
-// Constructs a new HTTP request message
+// Constructs a new HTTP request
 func NewHttpRequest(uri, method string) *HttpRequest {
 	u, err := url.Parse(uri)
 	if err != nil {
@@ -42,11 +37,23 @@ func NewHttpRequest(uri, method string) *HttpRequest {
 		ProtoMinor: 0,
 	}
 	var res *http.Response
-	return &HttpRequest{url: u, setting: defaultHttpSetting, req: &r, resp: res}
+	return &HttpRequest{url: u, req: &r, resp: res}
 }
 
+// HTTP Methods
+func NewGetRequest(uri string) *HttpRequest {
+	return NewHttpRequest(uri, http.MethodGet)
+}
+
+func NewPutRequest(uri string, d string) *HttpRequest {
+	req := NewHttpRequest(uri, http.MethodPut)
+	req.req.ContentLength = int64(len(d))
+	return Body(req, d)
+}
+
+// Issues an HTTP request and returns the response
 func SendRequest(r *HttpRequest) (*http.Response, error) {
-	dump, err := httputil.DumpRequest(r.req, r.setting.DumpBody)
+	dump, err := httputil.DumpRequest(r.req, true)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -61,7 +68,7 @@ func SendRequest(r *HttpRequest) (*http.Response, error) {
 	return resp, err
 }
 
-// Need bettter name tbh
+// Sends parameterized HTTP request and returns the response
 func GetResponse(r *HttpRequest) (*http.Response, error) {
 	resp, err := SendRequest(r)
 	if err != nil {
@@ -70,6 +77,7 @@ func GetResponse(r *HttpRequest) (*http.Response, error) {
 	return resp, err
 }
 
+// Getters
 func Response(r *HttpRequest) *http.Response {
 	return r.resp
 }
@@ -78,6 +86,22 @@ func Dump(r *HttpRequest) []byte {
 	return r.dump
 }
 
+// Adds content to request body (PUT, POST)
+func Body(r *HttpRequest, d string) *HttpRequest {
+	// https://stackoverflow.com/questions/33606330/golang-rewrite-http-request-body
+	r.req.Body = ioutil.NopCloser(strings.NewReader(d))
+	return r
+}
+
+func Method(r *HttpRequest) string {
+	return r.req.Method
+}
+
+func ContentLength(r *HttpRequest) int64 {
+	return r.req.ContentLength
+}
+
+// Setters
 func SetHost(r *HttpRequest, host string) {
 	r.req.Host = host
 }
@@ -85,9 +109,4 @@ func SetHost(r *HttpRequest, host string) {
 // https://pkg.go.dev/net/http#Header
 func SetHeader(r *HttpRequest, key, value string) {
 	r.req.Header.Set(key, value)
-}
-
-// Adds content to request body (PUT, POST)
-func SetBody(r *HttpRequest, data []byte) {
-	//r.req.Body = data
 }
