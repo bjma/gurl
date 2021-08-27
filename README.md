@@ -22,7 +22,8 @@ Run the Makefile using `make` to compile the executable. Then, simply run `gurl`
 ### Options
 * `url` - Specify URL (defaulted to `argv[1]`)
 * `X` - Specify METHOD (defaulted to `GET`)
-* `d` - Data to write; can be a `string`, or a file (prefixed by `@`) **TODO**
-* `o` - Write output to file (defaulted to `stdout`) **TODO**
+* `d` - Read data from a `string` or file prefixed by `@` **TODO**
+* `o` - Write output to file (defaulted to `stdout`)
 * `H` - Set header **TODO**
 * `s` - Suppress header output
+* `v` - Debugging
