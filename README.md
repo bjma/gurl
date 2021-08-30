@@ -19,6 +19,12 @@ Run the Makefile using `make` to compile the executable. Then, simply run `gurl`
 ./gurl [URL] [OPTIONS -f]
 ```
 
+To run the project globally, you can create an alias in your `.bash_profile`:
+```bash
+# ~/.bash_profile
+alias gurl="/path/to/project/gurl "
+```
+
 ### Options
 * `url` - Specify URL (defaulted to `argv[1]`)
 * `X` - Specify METHOD (defaulted to `GET`)

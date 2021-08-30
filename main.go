@@ -4,20 +4,19 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/bjma/gurl/filelib"
 	"github.com/bjma/gurl/httplib"
-	"github.com/bjma/gurl/util"
+	"github.com/bjma/gurl/utils"
 )
 
 // HTTP options
 var (
 	method  = flag.String("X", "GET", "HTTP method")
-	URI     = flag.String("url", os.Args[1], "HTTP request URL") // https://site.com, :/portNum, :, site.com
-	headers = flag.String("H", "", "HTTP headers in key:value format. To append multiple headers use ; as separators")
+	URI     = flag.String("url", "", "HTTP request URL") // https://site.com, :/portNum, :, site.com
+	headers = flag.String("H", "", "HTTP headers in key:value format. To append multiple headers use comma separators without whitespace")
 )
 
 // Data options
@@ -34,6 +33,10 @@ var (
 
 func main() {
 	flag.Parse()
+	// NOTE: Add a utils to parse command line to search for URL + a URL parser
+	if len(*URI) == 0 {
+		log.Fatalln("gurl: Empty URL")
+	}
 	execHTTP(*URI, *method)
 }
 
@@ -46,9 +49,10 @@ func execHTTP(url, method string) {
 	case "PUT":
 		if len(*data) == 0 {
 			// Or, set Content-Length = 0
-			log.Fatalln("ERR: No request body")
+			log.Fatalln("gurl: No request body")
 		}
-		body := util.ParseRequestBody(*data)
+		body := utils.ParseRequestBody(*data)
+		// NOTE: Offload type casting/conversion to utils package
 		contentLen := strconv.FormatInt(int64(len(*data)), 10)
 		req = httplib.NewPutRequest(url, body)
 		httplib.SetHeader(req, "Content-Length", contentLen)
@@ -74,8 +78,8 @@ func execHTTP(url, method string) {
 		panic(err)
 	}
 	reqHeader := httplib.Dump(req)
-	respHeader := util.FormatResponseHeader(method, resp)
-	respBody := util.FormatResponseBody(resp)
+	respHeader := utils.FormatResponseHeader(method, resp)
+	respBody := utils.FormatResponseBody(resp)
 
 	if !*silent {
 		fmt.Println(string(reqHeader))
@@ -87,12 +91,11 @@ func execHTTP(url, method string) {
 	}
 
 	if len(*output) > 0 {
-		// idk if we need synchronization rn
 		wlock := make(chan int, 1)
+        path := utils.ParseFile(*output)  
+        go filelib.WriteFile(path, respBody, wlock)
+        bytesWritten := <-wlock
 
-		path := util.ParseFile(*output)
-		go filelib.WriteFile(path, respBody, wlock)
-		bytesWritten := <-wlock
 		if *verbose {
 			fmt.Printf("Wrote %d bytes to %s:\n", bytesWritten, path)
 		}

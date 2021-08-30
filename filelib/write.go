@@ -5,7 +5,7 @@ import (
 	// "bufio"
 )
 
-// Wrties to file
+// Writes to file
 // https://gobyexample.com/writing-files
 func WriteFile(filePath string, data []byte, lock chan int) {
 	fd, err := os.Create(filePath)
@@ -20,8 +20,6 @@ func WriteFile(filePath string, data []byte, lock chan int) {
 		panic(err)
 	}
 	fd.Sync()
-	// Might not need synchronization here either,
-	// but in case we need to write from multiple goroutines
-	// might as well
+	// Might not need synchronization here
 	lock <- bytesWritten
 }

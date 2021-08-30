@@ -1,4 +1,4 @@
-package util
+package utils
 
 import (
 	"os"
@@ -10,8 +10,8 @@ import (
 
 var (
 	_, b, _, _ = runtime.Caller(0)
-	basepath   = filepath.Dir(b)
-	root       = filepath.Join(basepath, "../")
+	basepath   = filepath.Join(filepath.Dir(b), "../")
+	cwd, _     = os.Getwd()
 	homedir, _ = os.UserHomeDir()
 )
 
@@ -22,7 +22,7 @@ func ParseFile(file string) string {
 	if strings.HasPrefix(file, "@") {
 		path = ResolvePath(strings.TrimPrefix(file, "@"))
 	} else {
-		// Root directory, just return
+		// User root directory, just return
 		if strings.HasPrefix(file, "/") {
 			return file
 		}
@@ -38,12 +38,12 @@ func ResolvePath(path string) string {
 	if strings.HasPrefix(path, "~") {
 		absPath = filepath.Join(homedir, "")
 	} else {
-		absPath = filepath.Join(root, "")
+		absPath = filepath.Join(cwd, "")
 	}
 	f, paths := tokenizeFilePath(path)
 	for _, p := range paths {
+        // Handle relative paths
 		if match, _ := regexp.MatchString("^(.|~)+", p); match {
-			// Already handled case, so skip iteration
 			if strings.HasPrefix(p, "~") {
 				continue
 			}

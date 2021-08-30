@@ -1,4 +1,4 @@
-package util
+package utils
 
 import (
 	"fmt"
@@ -12,8 +12,8 @@ func TestParseFileBasic(t *testing.T) {
 		path string
 		want string
 	}{
-		{"file.txt", filepath.Join(root, "file.txt")},
-		{"tmp/file.txt", filepath.Join(root, "tmp/file.txt")},
+		{"../file.txt", filepath.Join(basepath, "file.txt")},
+		{"../tmp/file.txt", filepath.Join(basepath, "tmp/file.txt")},
 	}
 	for _, test := range tests {
 		testname := fmt.Sprintf("%s\n", test.path)
@@ -26,14 +26,13 @@ func TestParseFileBasic(t *testing.T) {
 	}
 }
 
-// Tests if we can create a file from an absolute path,
-// prev paths (e.g. "../", "../../"), etc.
+// Tests ParseFile on nested relative paths and home path
 func TestParseFileDriven(t *testing.T) {
 	var tests = []struct {
 		path string
 		want string
 	}{
-		{"../file.txt", filepath.Join(filepath.Join(root, "../"), "file.txt")},
+		{"../../file.txt", filepath.Join(filepath.Join(basepath, "../"), "file.txt")},
 		{"~/bee-was-here.txt", filepath.Join("/Users/bjma", "bee-was-here.txt")},
 	}
 	for _, test := range tests {

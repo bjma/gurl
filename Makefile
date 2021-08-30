@@ -21,35 +21,45 @@ clean:
 fmt:
 	@go fmt ./...
 
-# shitty way of testing rn bc i dont feel like reading Go's testing library
-get: build
-	./$(EXEC) 'https://httpbin.org/get'
+# HTTP testing
+test-get: build
+	./$(EXEC) -url 'https://httpbin.org/get'
 
-get-write: build
+test-get-write: build
 	./$(EXEC) -url 'https://httpbin.org/get' -o tmp/file.txt -s -v
 	@cat $(PWD)/tmp/file.txt
 
-put: build
+test-put: build
 	./$(EXEC) -url 'https://httpbin.org/put' -X PUT -d '{"bogos":"binted"}' -H 'Content-Type: application/json'
 
-put-write: build
+test-put-write: build
 	./$(EXEC) -url 'https://httpbin.org/put' -X PUT -d '{"bogos":"binted"}' -H 'Content-Type: application/json' -o tmp/file.txt -s -v
 	@cat $(PWD)/tmp/file.txt
 
-put-read-single: build
+test-put-read-single: build
 	@mkdir -p tmp
 	@echo '{"bogos":"binted"}' > $(PWD)/tmp/data.json
 	# @tmp/data.json or @./tmp/data.json
 	./$(EXEC) -url 'https://httpbin.org/put' -X PUT -d '@tmp/data.json' -H 'Content-Type: application/json'
 
 
-put-read-write: build
+test-put-read-write: build
 	./$(EXEC) -url 'https://httpbin.org/put' -X PUT -d '@/tmp/data.json' -H 'Content-Type: application/json' -o file.txt -s
 
-write-null: build
-	./$(EXEC) -url 'https://httpbin.org/get' -o /dev/null
+# Flag testing
+test-write-null: build
+	./$(EXEC) -url 'https://httpbin.org/get' -o /dev/null -s
 
-# smaller unit tests
+test-set-headers: build
+	@./$(EXEC) -url 'https://httpbin.org/get' -o /dev/null -H "Accept-Language: en,Accept: text/html; application/json,User-Agent: poopoo,Cache-Control: no-cache,Content-Encoding: gzip"
+
+# Package testing
 test-util: build
 	@go test -v "github.com/bjma/gurl/util"
+
+test-httplib: build
+	@echo 'go test -v "github.com/bjma/gurl/httplib"
+
+test-filelib: build
+	@echo 'go test -v "github.com/bjma/gurl/filelib"
 	
