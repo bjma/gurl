@@ -20,8 +20,8 @@ func FormatResponseHeader(method string, resp *http.Response) []byte {
 	return buf.Bytes()
 }
 
-func FormatResponseBody(res *http.Response) []byte {
-	bodyBytes, err := ioutil.ReadAll(res.Body)
+func FormatResponseBody(resp *http.Response) []byte {
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}

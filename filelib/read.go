@@ -16,13 +16,13 @@ func ReadFile(filepath string) []byte {
 	if err != nil {
 		panic(err)
 	}
-    defer f.Close()
-    
-    // If not JSON, simply read into byte array
-    bytes, err := ioutil.ReadAll(f)
-    if err != nil {
-        panic("gurl: unable to read file")
-    }
+	defer f.Close()
+
+	// If not JSON, simply read into byte array
+	bytes, err := ioutil.ReadAll(f)
+	if err != nil {
+		panic("gurl: unable to read file")
+	}
 
 	// We want to be structure-agnostic, meaning that
 	// the structure/schema of the JSON data does
@@ -33,10 +33,10 @@ func ReadFile(filepath string) []byte {
 
 	// We also want to be able to read JSON arrays, as `curl` currently does not do this.
 	// see: https://www.sohamkamani.com/golang/parsing-json/#json-arrays
-	if getFileExtension(filepath) == "json" {
-        var jsonData map[string]interface{}
-        json.Unmarshal(bytes, &jsonData)
-        d, err = json.Marshal(jsonData)
+	if GetFileExtension(filepath) == "json" {
+		var jsonData map[string]interface{}
+		json.Unmarshal(bytes, &jsonData)
+		d, err = json.Marshal(jsonData)
 	} else {
 		d = bytes
 	}

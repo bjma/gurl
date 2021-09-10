@@ -41,10 +41,18 @@ func Get(uri string) *HttpRequest {
 
 // HTTP PUT
 func Put(uri string, d string) *HttpRequest {
-	req := NewHttpRequest(uri, http.MethodPut)
-	req.req.ContentLength = int64(len(d))
-	req = Body(req, d)
-	return req
+	r := NewHttpRequest(uri, http.MethodPut)
+	r.req.ContentLength = int64(len(d))
+	r = Body(r, d)
+	return r
+}
+
+// HTTP POST
+func Post(uri string, d string) *HttpRequest {
+	r := NewHttpRequest(uri, http.MethodPost)
+	r.req.ContentLength = int64(len(d))
+	r = Body(r, d)
+	return r
 }
 
 // Issues an HTTP request and returns the response
@@ -55,7 +63,16 @@ func SendRequest(r *HttpRequest) (*http.Response, error) {
 	}
 	r.dump = dump
 	client := &http.Client{}
-	resp, err := client.Do(r.req)
+
+	var resp *http.Response
+	// According to Go's `net/http` packages,
+	// it's more idiomatic to use `Post` instead of `Do`.
+	// see: https://pkg.go.dev/net/http#Client.Do
+	if Method(r) == "POST" {
+		resp, err = client.Post(r.url.String(), Header(r, "Content-Type"), r.req.Body)
+	} else {
+		resp, err = client.Do(r.req)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -86,6 +103,10 @@ func Body(r *HttpRequest, d string) *HttpRequest {
 
 func Method(r *HttpRequest) string {
 	return r.req.Method
+}
+
+func Header(r *HttpRequest, key string) string {
+	return r.req.Header.Get(key)
 }
 
 func ContentLength(r *HttpRequest) int64 {

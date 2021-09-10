@@ -71,7 +71,7 @@ func ResolvePath(path string) string {
 }
 
 // Returns the file extension of a filename
-func getFileExtension(file string) string {
+func GetFileExtension(file string) string {
 	// Reverse string so that we can get LAST occurence of `.` (handles cases like `foo.bar.txt`)
 	f := utils.ReverseString(file)
 	i := strings.Index(f, ".")

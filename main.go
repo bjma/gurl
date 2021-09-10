@@ -53,17 +53,28 @@ func execHTTP(url, method string) {
 			log.Fatalln("gurl: No request body")
 		}
 		body := httplib.ParseRequestBody(*data)
-		// offload type conversion to separate package or file
 		contentLen := utils.Int64ToStr(int64(len(*data)))
 		req = httplib.Put(url, body)
+		httplib.SetHeader(req, "Content-Length", contentLen)
+	case "POST":
+		if len(*data) == 0 {
+			log.Fatalln("gurl: No request body")
+		}
+		body := httplib.ParseRequestBody(*data)
+		contentLen := utils.Int64ToStr(int64(len(*data)))
+		req = httplib.Post(url, body)
+		if filelib.GetFileExtension(*data) == "json" {
+			httplib.SetHeader(req, "Content-Type", "application/json")
+		}
 		httplib.SetHeader(req, "Content-Length", contentLen)
 	default:
 		req = httplib.Get(url)
 	}
 
 	// Default headers
-	httplib.SetHeader(req, "Accept", "*/*")
 	httplib.SetHeader(req, "User-Agent", "gurl/1.0")
+	httplib.SetHeader(req, "Accept", "*/*")
+	httplib.SetHeader(req, "Content-Type", "text/plain")
 	// Custom headers
 	if len(*headers) > 0 {
 		for _, header := range strings.Split(*headers, ",") {
@@ -73,6 +84,7 @@ func execHTTP(url, method string) {
 			httplib.SetHeader(req, k, v)
 		}
 	}
+
 	// Issue HTTP request
 	resp := httplib.Response(req)
 

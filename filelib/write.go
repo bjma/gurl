@@ -21,5 +21,7 @@ func WriteFile(filePath string, data []byte, lock chan int) {
 	}
 	fd.Sync()
 	// Might not need synchronization here
-	lock <- bytesWritten
+	if lock != nil {
+		lock <- bytesWritten
+	}
 }

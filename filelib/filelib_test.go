@@ -58,9 +58,28 @@ func TestGetFileExtension(t *testing.T) {
 	for _, test := range tests {
 		testname := fmt.Sprintf("%s\n", test.str)
 		t.Run(testname, func(t *testing.T) {
-			ans := getFileExtension(test.str)
+			ans := GetFileExtension(test.str)
 			if ans != test.want {
 				t.Errorf("ReverseString: Got %s, want %s\n", ans, test.want)
+			}
+		})
+	}
+}
+
+func TestReadFile(t *testing.T) {
+	var tests = []struct {
+		file string
+		want string
+	}{
+		{"../tmp/foo.json", "{\"data\":\"you got pwned :)\"}"},
+	}
+	for _, test := range tests {
+		testname := fmt.Sprintf("%s\n", test.file)
+		t.Run(testname, func(t *testing.T) {
+			WriteFile(testname, []byte(test.want), nil)
+			ans := ReadFile(testname)
+			if string(ans) != test.want {
+				t.Errorf("ReadFile: Got %s, want %s\n", ans, test.want)
 			}
 		})
 	}
