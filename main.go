@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 
 	"github.com/bjma/gurl/filelib"
@@ -33,7 +32,7 @@ var (
 
 func main() {
 	flag.Parse()
-	// NOTE: Add a utils to parse command line to search for URL + a URL parser
+	// NOTE: Add a httplib to parse command line to search for URL + a URL parser
 	if len(*URI) == 0 {
 		log.Fatalln("gurl: Empty URL")
 	}
@@ -46,18 +45,20 @@ func execHTTP(url, method string) {
 
 	// Initialize request according to flags
 	switch method {
+	case "GET":
+		req = httplib.Get(url)
 	case "PUT":
 		if len(*data) == 0 {
 			// Or, set Content-Length = 0
 			log.Fatalln("gurl: No request body")
 		}
-		body := utils.ParseRequestBody(*data)
-		// NOTE: Offload type casting/conversion to utils package
-		contentLen := strconv.FormatInt(int64(len(*data)), 10)
-		req = httplib.NewPutRequest(url, body)
+		body := httplib.ParseRequestBody(*data)
+		// offload type conversion to separate package or file
+		contentLen := utils.Int64ToStr(int64(len(*data)))
+		req = httplib.Put(url, body)
 		httplib.SetHeader(req, "Content-Length", contentLen)
 	default:
-		req = httplib.NewGetRequest(url)
+		req = httplib.Get(url)
 	}
 
 	// Default headers
@@ -72,14 +73,13 @@ func execHTTP(url, method string) {
 			httplib.SetHeader(req, k, v)
 		}
 	}
+	// Issue HTTP request
+	resp := httplib.Response(req)
 
-	resp, err := httplib.GetResponse(req)
-	if err != nil {
-		panic(err)
-	}
+	// Formatting
 	reqHeader := httplib.Dump(req)
-	respHeader := utils.FormatResponseHeader(method, resp)
-	respBody := utils.FormatResponseBody(resp)
+	respHeader := httplib.FormatResponseHeader(method, resp)
+	respBody := httplib.FormatResponseBody(resp)
 
 	if !*silent {
 		fmt.Println(string(reqHeader))
@@ -92,9 +92,9 @@ func execHTTP(url, method string) {
 
 	if len(*output) > 0 {
 		wlock := make(chan int, 1)
-        path := utils.ParseFile(*output)  
-        go filelib.WriteFile(path, respBody, wlock)
-        bytesWritten := <-wlock
+		path := filelib.ParseFile(*output)
+		go filelib.WriteFile(path, respBody, wlock)
+		bytesWritten := <-wlock
 
 		if *verbose {
 			fmt.Printf("Wrote %d bytes to %s:\n", bytesWritten, path)

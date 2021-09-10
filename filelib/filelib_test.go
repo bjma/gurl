@@ -1,4 +1,4 @@
-package utils
+package filelib
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ func TestParseFileDriven(t *testing.T) {
 		want string
 	}{
 		{"../../file.txt", filepath.Join(filepath.Join(basepath, "../"), "file.txt")},
-		{"~/bee-was-here.txt", filepath.Join("/Users/bjma", "bee-was-here.txt")},
+		{"~/bri-was-here.txt", filepath.Join("/Users/bjma", "bri-was-here.txt")},
 	}
 	for _, test := range tests {
 		testname := fmt.Sprintf("%s\n", test.path)
@@ -41,6 +41,26 @@ func TestParseFileDriven(t *testing.T) {
 			ans := ParseFile(test.path)
 			if ans != test.want {
 				t.Errorf("ParseFile: Got %s, want %s\n", ans, test.want)
+			}
+		})
+	}
+}
+
+func TestGetFileExtension(t *testing.T) {
+	var tests = []struct {
+		str  string
+		want string
+	}{
+		{"foo.txt", "txt"},
+		{"foo.bar.txt", "txt"},
+		{"foo", "foo"},
+	}
+	for _, test := range tests {
+		testname := fmt.Sprintf("%s\n", test.str)
+		t.Run(testname, func(t *testing.T) {
+			ans := getFileExtension(test.str)
+			if ans != test.want {
+				t.Errorf("ReverseString: Got %s, want %s\n", ans, test.want)
 			}
 		})
 	}

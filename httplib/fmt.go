@@ -1,10 +1,12 @@
-package utils
+package httplib
 
 import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/bjma/gurl/filelib"
 )
 
 // https://developer.mozilla.org/en-US/docs/Glossary/Response_header
@@ -32,7 +34,9 @@ func FormatResponseBody(res *http.Response) []byte {
 func ParseRequestBody(data string) string {
 	var reqBody string
 	if strings.HasPrefix(data, "@") {
-		reqBody = ParseFile(data)
+		f := filelib.ParseFile(data)
+		// Read data and return as request body
+		reqBody = string(filelib.ReadFile(f))
 	} else {
 		reqBody = data
 	}

@@ -9,12 +9,6 @@ import (
 	"strings"
 )
 
-var defaultHttpSetting = HttpSettings{true}
-
-type HttpSettings struct {
-	DumpBody bool
-}
-
 type HttpRequest struct {
 	req  *http.Request
 	resp *http.Response
@@ -40,15 +34,17 @@ func NewHttpRequest(uri, method string) *HttpRequest {
 	return &HttpRequest{url: u, req: &r, resp: res}
 }
 
-// HTTP Methods
-func NewGetRequest(uri string) *HttpRequest {
+// HTTP GET
+func Get(uri string) *HttpRequest {
 	return NewHttpRequest(uri, http.MethodGet)
 }
 
-func NewPutRequest(uri string, d string) *HttpRequest {
+// HTTP PUT
+func Put(uri string, d string) *HttpRequest {
 	req := NewHttpRequest(uri, http.MethodPut)
 	req.req.ContentLength = int64(len(d))
-	return Body(req, d)
+	req = Body(req, d)
+	return req
 }
 
 // Issues an HTTP request and returns the response
@@ -68,18 +64,13 @@ func SendRequest(r *HttpRequest) (*http.Response, error) {
 	return resp, err
 }
 
-// Sends parameterized HTTP request and returns the response
-func GetResponse(r *HttpRequest) (*http.Response, error) {
-	resp, err := SendRequest(r)
-	if err != nil {
-		return nil, err
-	}
-	return resp, err
-}
-
 // Getters
 func Response(r *HttpRequest) *http.Response {
-	return r.resp
+	resp, err := SendRequest(r)
+	if err != nil {
+		panic(err)
+	}
+	return resp
 }
 
 func Dump(r *HttpRequest) []byte {
@@ -102,11 +93,7 @@ func ContentLength(r *HttpRequest) int64 {
 }
 
 // Setters
-func SetHost(r *HttpRequest, host string) {
-	r.req.Host = host
-}
-
-// https://pkg.go.dev/net/http#Header
 func SetHeader(r *HttpRequest, key, value string) {
+	// https://pkg.go.dev/net/http#Header
 	r.req.Header.Set(key, value)
 }
