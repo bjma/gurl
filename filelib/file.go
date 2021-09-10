@@ -44,7 +44,7 @@ func ParseFile(file string) string {
 }
 
 // Resolves a file path by constructing an absolute path to the file,
-// creating any directories that don't exist
+// creating any directories that don't exist.
 func ResolvePath(path string) string {
 	var absPath string
 	if strings.HasPrefix(path, "~") {
@@ -70,15 +70,15 @@ func ResolvePath(path string) string {
 	return absPath
 }
 
-// Returns the file extension of a filename
+// Returns the file extension of a filename as a string.
+// If the filename does not contain a real file extension,
+// then the filename is returned as is.
 func GetFileExtension(file string) string {
 	// Reverse string so that we can get LAST occurence of `.` (handles cases like `foo.bar.txt`)
 	f := utils.ReverseString(file)
 	i := strings.Index(f, ".")
-	if i < 0 {
+	if i <= 0 {
 		return file
-	} else if i == 0 {
-		panic("gurl: Failed writing body to file with filename " + file)
 	}
 	return file[len(file)-i:]
 }

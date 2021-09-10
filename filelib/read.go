@@ -4,41 +4,62 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+
+	"github.com/bjma/gurl/handler"
 )
 
-// For our use case, we want to be able to parse
-// JSON files, but also read regular text from files.
-// So, we should always check the file extension first.
-func ReadFile(filepath string) []byte {
+// Reads from file defined by `path` and returns bytes read.
+func ReadFile(path string) []byte {
 	var d []byte
 
-	f, err := os.Open(filepath)
+	f, err := os.Open(path)
 	if err != nil {
-		panic(err)
+		handler.HandleError(err)
 	}
 	defer f.Close()
 
 	// If not JSON, simply read into byte array
 	bytes, err := ioutil.ReadAll(f)
 	if err != nil {
-		panic("gurl: unable to read file")
+        // NOTE: cURL handles null file descriptors as empty bodies
+		handler.HandleError(err)
 	}
-
-	// We want to be structure-agnostic, meaning that
-	// the structure/schema of the JSON data does
-	// not necessarily have to be uniform. We simply
-	// want to read the data into a data structure,
-	// and send it via HTTP.
-	// see: https://www.sohamkamani.com/golang/parsing-json/#unstructured-data-decoding-json-to-maps
-
 	// We also want to be able to read JSON arrays, as `curl` currently does not do this.
 	// see: https://www.sohamkamani.com/golang/parsing-json/#json-arrays
-	if GetFileExtension(filepath) == "json" {
-		var jsonData map[string]interface{}
-		json.Unmarshal(bytes, &jsonData)
-		d, err = json.Marshal(jsonData)
+	if GetFileExtension(path) == "json" {
+		if jsonIsArray(bytes) {
+			d = readJsonArray(bytes)
+		} else {
+			d = readJsonObj(bytes)
+		}
 	} else {
 		d = bytes
+	}
+	return d
+}
+
+// Reads JSON object
+func readJsonObj(b []byte) []byte {
+    if !jsonIsObject(b) {
+        err := handler.NewError("not a valid JSON object")
+        handler.HandleError(err)
+    }
+	var jsonData map[string]interface{}
+	json.Unmarshal(b, &jsonData)
+	d, err := json.Marshal(jsonData)
+	if err != nil {
+		handler.HandleError(err)
+	}
+	return d
+}
+
+// Read JSON array
+func readJsonArray(b []byte) []byte {
+	var jsonData []map[string]interface{}
+	json.Unmarshal(b, &jsonData)
+	d, err := json.Marshal(jsonData)
+	if err != nil {
+		handler.HandleError(err)
 	}
 	return d
 }

@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/bjma/gurl/filelib"
+	"github.com/bjma/gurl/handler"
 	"github.com/bjma/gurl/httplib"
 	"github.com/bjma/gurl/utils"
 )
@@ -34,7 +34,8 @@ func main() {
 	flag.Parse()
 	// NOTE: Add a httplib to parse command line to search for URL + a URL parser
 	if len(*URI) == 0 {
-		log.Fatalln("gurl: Empty URL")
+        err := handler.NewError("empty URL")
+		handler.HandleError(err)
 	}
 	execHTTP(*URI, *method)
 }
@@ -49,8 +50,9 @@ func execHTTP(url, method string) {
 		req = httplib.Get(url)
 	case "PUT":
 		if len(*data) == 0 {
-			// Or, set Content-Length = 0
-			log.Fatalln("gurl: No request body")
+            // Or, set Content-Length = 0
+            err := handler.NewError("no request body")
+			handler.HandleError(err)
 		}
 		body := httplib.ParseRequestBody(*data)
 		contentLen := utils.Int64ToStr(int64(len(*data)))
@@ -58,7 +60,8 @@ func execHTTP(url, method string) {
 		httplib.SetHeader(req, "Content-Length", contentLen)
 	case "POST":
 		if len(*data) == 0 {
-			log.Fatalln("gurl: No request body")
+            err := handler.NewError("no request body")
+			handler.HandleError(err)
 		}
 		body := httplib.ParseRequestBody(*data)
 		contentLen := utils.Int64ToStr(int64(len(*data)))
@@ -103,10 +106,8 @@ func execHTTP(url, method string) {
 	}
 
 	if len(*output) > 0 {
-		wlock := make(chan int, 1)
 		path := filelib.ParseFile(*output)
-		go filelib.WriteFile(path, respBody, wlock)
-		bytesWritten := <-wlock
+		bytesWritten := filelib.WriteFile(path, respBody)
 
 		if *verbose {
 			fmt.Printf("Wrote %d bytes to %s:\n", bytesWritten, path)

@@ -2,26 +2,29 @@ package filelib
 
 import (
 	"os"
-	// "bufio"
+
+	"github.com/bjma/gurl/handler"
 )
 
-// Writes to file
-// https://gobyexample.com/writing-files
-func WriteFile(filePath string, data []byte, lock chan int) {
-	fd, err := os.Create(filePath)
+// Writes byte array to file located at `path`
+// and returns number of bytes written to file.
+// If file does not exist, a new file with the filename
+// defined by `path` will be created; else, the
+// file is truncated.
+//
+// See: https://gobyexample.com/writing-files
+func WriteFile(path string, data []byte) int {
+	fd, err := os.Create(path)
 	if err != nil {
-		panic(err)
+		handler.HandleError(err)
 	}
 	defer fd.Close()
 
 	// Write byte data into file
 	bytesWritten, err := fd.Write(data)
 	if err != nil {
-		panic(err)
+		handler.HandleError(err)
 	}
 	fd.Sync()
-	// Might not need synchronization here
-	if lock != nil {
-		lock <- bytesWritten
-	}
+	return bytesWritten
 }

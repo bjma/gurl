@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/bjma/gurl/filelib"
+	"github.com/bjma/gurl/handler"
 )
 
 // https://developer.mozilla.org/en-US/docs/Glossary/Response_header
@@ -23,7 +24,7 @@ func FormatResponseHeader(method string, resp *http.Response) []byte {
 func FormatResponseBody(resp *http.Response) []byte {
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		handler.HandleError(err)
 	}
 	bodyStr := bodyBytes
 	return bodyStr

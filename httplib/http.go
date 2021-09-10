@@ -1,12 +1,13 @@
 package httplib
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strings"
+
+	"github.com/bjma/gurl/handler"
 )
 
 type HttpRequest struct {
@@ -20,7 +21,8 @@ type HttpRequest struct {
 func NewHttpRequest(uri, method string) *HttpRequest {
 	u, err := url.Parse(uri)
 	if err != nil {
-		panic(err)
+        err = handler.NewError("unable to create request with URL: " + u.String())
+		handler.HandleError(err)
 	}
 	r := http.Request{
 		Method:     method,
@@ -59,7 +61,7 @@ func Post(uri string, d string) *HttpRequest {
 func SendRequest(r *HttpRequest) (*http.Response, error) {
 	dump, err := httputil.DumpRequest(r.req, true)
 	if err != nil {
-		fmt.Println(err.Error())
+		handler.HandleError(err)
 	}
 	r.dump = dump
 	client := &http.Client{}
@@ -77,7 +79,7 @@ func SendRequest(r *HttpRequest) (*http.Response, error) {
 func Response(r *HttpRequest) *http.Response {
 	resp, err := SendRequest(r)
 	if err != nil {
-		panic(err)
+		handler.HandleError(err)
 	}
 	return resp
 }
