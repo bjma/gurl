@@ -32,6 +32,6 @@ gurl [URL] [OPTIONS]
 * `d` - Read data from a `string` or file prefixed by `@` **TODO**
 * `o` - Write output to file (defaulted to `stdout`)
 * `H` - Set header
-* `s` - Suppress header output //REVISIT
+* `s` - Suppress header output
 * `v` - Debugging
 * `i` - Show response header

@@ -64,7 +64,13 @@ test-put-read-write: build
 	./$(EXEC) -url 'https://httpbin.org/put' -X PUT -d '@/tmp/data.json' -H 'Content-Type: application/json' -o tmp/file.txt -s
 	@cat $(PWD)/tmp/file.txt
 
-test-post-read: build
+test-post-read-single: build
+	@mkdir -p tmp
+	@echo '{"data":"foo bar"}' > $(PWD)/tmp/data.json
+	# @tmp/data.json or @./tmp/data.json
+	./$(EXEC) -url 'https://httpbin.org/post' -X POST -d '@tmp/data.json' -H 'Content-Type: application/json'
+
+test-post-read-multiple: build
 	@mkdir -p tmp
 	@echo '[{"data":"Thing One"}, {"data":"Thing Two"}]' > $(PWD)/tmp/data.json
 	# @tmp/data.json or @./tmp/data.json
