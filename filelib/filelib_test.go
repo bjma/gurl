@@ -89,21 +89,21 @@ func TestReadFile(t *testing.T) {
 }
 
 func TestJsonIsArray(t *testing.T) {
-    var tests = []struct {
+	var tests = []struct {
 		data string
 		want bool
 	}{
-        {"{\"data\":\"i am an object\"}", false},
+		{"{\"data\":\"i am an object\"}", false},
 		{"[{\"data\":\"i am\"}, {\"data\":\"an array\"}]", true},
 	}
 	for _, test := range tests {
 		testname := fmt.Sprintf("%s\n", test.data)
 		t.Run(testname, func(t *testing.T) {
-            d := utils.StrToByteArray(test.data)
-            ans := jsonIsArray(d)
-            if ans != test.want {
-                t.Errorf("jsonIsArray: Got %t, want %t\n", ans, test.want)
-            }
+			d := utils.StrToByteArray(test.data)
+			ans := jsonIsArray(d)
+			if ans != test.want {
+				t.Errorf("jsonIsArray: Got %t, want %t\n", ans, test.want)
+			}
 		})
 	}
 }

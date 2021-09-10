@@ -34,7 +34,7 @@ func main() {
 	flag.Parse()
 	// NOTE: Add a httplib to parse command line to search for URL + a URL parser
 	if len(*URI) == 0 {
-        err := handler.NewError("empty URL")
+		err := handler.NewError("empty URL")
 		handler.HandleError(err)
 	}
 	doHTTP(*URI, *method)
@@ -50,8 +50,8 @@ func doHTTP(url, method string) {
 		req = httplib.Get(url)
 	case "PUT":
 		if len(*data) == 0 {
-            // Or, set Content-Length = 0
-            err := handler.NewError("no request body")
+			// Or, set Content-Length = 0
+			err := handler.NewError("no request body")
 			handler.HandleError(err)
 		}
 		body := httplib.ParseRequestBody(*data)
@@ -60,7 +60,7 @@ func doHTTP(url, method string) {
 		httplib.SetHeader(req, "Content-Length", contentLen)
 	case "POST":
 		if len(*data) == 0 {
-            err := handler.NewError("no request body")
+			err := handler.NewError("no request body")
 			handler.HandleError(err)
 		}
 		body := httplib.ParseRequestBody(*data)

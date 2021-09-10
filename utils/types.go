@@ -9,9 +9,9 @@ func Int64ToStr(num int64) string {
 }
 
 func ByteArrayToStr(b []byte) string {
-    return string(b)
+	return string(b)
 }
 
 func StrToByteArray(s string) []byte {
-    return []byte(s)
+	return []byte(s)
 }

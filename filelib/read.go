@@ -21,7 +21,7 @@ func ReadFile(path string) []byte {
 	// If not JSON, simply read into byte array
 	bytes, err := ioutil.ReadAll(f)
 	if err != nil {
-        // NOTE: cURL handles null file descriptors as empty bodies
+		// NOTE: cURL handles null file descriptors as empty bodies
 		handler.HandleError(err)
 	}
 	// We also want to be able to read JSON arrays, as `curl` currently does not do this.
@@ -40,10 +40,10 @@ func ReadFile(path string) []byte {
 
 // Reads JSON object
 func readJsonObj(b []byte) []byte {
-    if !jsonIsObject(b) {
-        err := handler.NewError("not a valid JSON object")
-        handler.HandleError(err)
-    }
+	if !jsonIsObject(b) {
+		err := handler.NewError("not a valid JSON object")
+		handler.HandleError(err)
+	}
 	var jsonData map[string]interface{}
 	json.Unmarshal(b, &jsonData)
 	d, err := json.Marshal(jsonData)

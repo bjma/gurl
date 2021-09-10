@@ -21,7 +21,7 @@ type HttpRequest struct {
 func NewHttpRequest(uri, method string) *HttpRequest {
 	u, err := url.Parse(uri)
 	if err != nil {
-        err = handler.NewError("unable to create request with URL: " + u.String())
+		err = handler.NewError("unable to create request with URL: " + u.String())
 		handler.HandleError(err)
 	}
 	r := http.Request{
