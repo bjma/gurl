@@ -68,7 +68,7 @@ test-post-read: build
 	@mkdir -p tmp
 	@echo '[{"data":"Thing One"}, {"data":"Thing Two"}]' > $(PWD)/tmp/data.json
 	# @tmp/data.json or @./tmp/data.json
-	./$(EXEC) -url 'http://localhost:8080/api/test' -X POST -d '@tmp/data.json' -H 'Content-Type: application/json'
+	./$(EXEC) -url 'https://httpbin.org/post' -X POST -d '@tmp/data.json' -H 'Content-Type: application/json'
 
 # Flag testing
 test-write-null: build
