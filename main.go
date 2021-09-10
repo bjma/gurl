@@ -37,11 +37,11 @@ func main() {
         err := handler.NewError("empty URL")
 		handler.HandleError(err)
 	}
-	execHTTP(*URI, *method)
+	doHTTP(*URI, *method)
 }
 
 // Sets the request headers, send HTTP request
-func execHTTP(url, method string) {
+func doHTTP(url, method string) {
 	var req *httplib.HttpRequest
 
 	// Initialize request according to flags
