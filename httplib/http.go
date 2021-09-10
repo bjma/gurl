@@ -64,15 +64,7 @@ func SendRequest(r *HttpRequest) (*http.Response, error) {
 	r.dump = dump
 	client := &http.Client{}
 
-	var resp *http.Response
-	// According to Go's `net/http` packages,
-	// it's more idiomatic to use `Post` instead of `Do`.
-	// see: https://pkg.go.dev/net/http#Client.Do
-	if Method(r) == "POST" {
-		resp, err = client.Post(r.url.String(), Header(r, "Content-Type"), r.req.Body)
-	} else {
-		resp, err = client.Do(r.req)
-	}
+	resp, err := client.Do(r.req)
 	if err != nil {
 		return nil, err
 	}
