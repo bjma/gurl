@@ -57,6 +57,10 @@ func Post(uri string, d string) *HttpRequest {
 	return r
 }
 
+func Head(uri string) *HttpRequest {
+    return NewHttpRequest(uri, http.MethodHead)
+}
+
 // Issues an HTTP request and returns the response
 func SendRequest(r *HttpRequest) (*http.Response, error) {
 	dump, err := httputil.DumpRequest(r.req, true)

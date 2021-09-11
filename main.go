@@ -72,7 +72,9 @@ func doHTTP(url, method string) {
 		if filelib.GetFileExtension(*data) == "json" {
 			httplib.SetHeader(req, "Content-Type", "application/json")
 		}
-		httplib.SetHeader(req, "Content-Length", contentLen)
+        httplib.SetHeader(req, "Content-Length", contentLen)
+    case "HEAD":
+        req = httplib.Head(url)
 	default:
 		req = httplib.Get(url)
 	}
@@ -102,11 +104,11 @@ func doHTTP(url, method string) {
 	respBody := httplib.FormatResponseBody(resp)
 
 	if !*silent {
-		fmt.Println(string(reqHeader))
-		if httplib.Method(req) != "GET" {
-			// Extra newline for response body
-			fmt.Printf("\n")
-		}
+        fmt.Println(string(reqHeader))
+        if len(*data) > 0 {
+            // Newline for response body
+            fmt.Printf("\n")
+        }
 		fmt.Println(string(respHeader))
 	}
 

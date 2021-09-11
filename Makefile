@@ -76,6 +76,9 @@ test-post-read-multiple: build
 	# @tmp/data.json or @./tmp/data.json
 	./$(EXEC) -url 'https://httpbin.org/post' -X POST -d '@tmp/data.json' -H 'Content-Type: application/json'
 
+test-head: build
+	./$(EXEC) -url 'https://httpbin.org/head' -X HEAD
+
 # Flag testing
 test-write-null: build
 	./$(EXEC) -url 'https://httpbin.org/get' -o /dev/null -s
