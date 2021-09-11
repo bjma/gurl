@@ -58,7 +58,7 @@ func Post(uri string, d string) *HttpRequest {
 }
 
 func Head(uri string) *HttpRequest {
-    return NewHttpRequest(uri, http.MethodHead)
+	return NewHttpRequest(uri, http.MethodHead)
 }
 
 // Issues an HTTP request and returns the response

@@ -56,8 +56,8 @@ func doHTTP(url, method string) {
 		}
 		body := httplib.ParseRequestBody(*data)
 		contentLen := utils.Int64ToStr(int64(len(*data)))
-        req = httplib.Put(url, body)
-        if filelib.GetFileExtension(*data) == "json" {
+		req = httplib.Put(url, body)
+		if filelib.GetFileExtension(*data) == "json" {
 			httplib.SetHeader(req, "Content-Type", "application/json")
 		}
 		httplib.SetHeader(req, "Content-Length", contentLen)
@@ -72,9 +72,9 @@ func doHTTP(url, method string) {
 		if filelib.GetFileExtension(*data) == "json" {
 			httplib.SetHeader(req, "Content-Type", "application/json")
 		}
-        httplib.SetHeader(req, "Content-Length", contentLen)
-    case "HEAD":
-        req = httplib.Head(url)
+		httplib.SetHeader(req, "Content-Length", contentLen)
+	case "HEAD":
+		req = httplib.Head(url)
 	default:
 		req = httplib.Get(url)
 	}
@@ -82,9 +82,9 @@ func doHTTP(url, method string) {
 	// Default headers
 	httplib.SetHeader(req, "User-Agent", "gurl/1.0")
 	httplib.SetHeader(req, "Accept", "*/*")
-	if (httplib.Header(req, "Content-Type") == "") {
-        httplib.SetHeader(req, "Content-Type", "text/plain")
-    } 
+	if httplib.Header(req, "Content-Type") == "" {
+		httplib.SetHeader(req, "Content-Type", "text/plain")
+	}
 	// Custom headers
 	if len(*headers) > 0 {
 		for _, header := range strings.Split(*headers, ",") {
@@ -104,11 +104,11 @@ func doHTTP(url, method string) {
 	respBody := httplib.FormatResponseBody(resp)
 
 	if !*silent {
-        fmt.Println(string(reqHeader))
-        if len(*data) > 0 {
-            // Newline for response body
-            fmt.Printf("\n")
-        }
+		fmt.Println(string(reqHeader))
+		if len(*data) > 0 {
+			// Newline for response body
+			fmt.Printf("\n")
+		}
 		fmt.Println(string(respHeader))
 	}
 
